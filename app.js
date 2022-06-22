@@ -3,6 +3,7 @@ const app = express();
 const Unidade = require('./models/Unidade');
 const Atendente = require('./models/Atendente');
 const Cliente = require('./models/Cliente');
+const Procedimento = require('./models/Procedimento');
 const Session = require('./models/Session');
 
 app.use(express.json());
@@ -162,6 +163,59 @@ app.delete('/del-cliente', async (req, res) => {
     try {
      const cliente = await Cliente.destroy(req.params.id)
      res.status(200).json({ cliente: cliente })
+    } catch (error) {
+     res.status(422).json({ error })
+    }
+});
+
+// Procedimento
+app.get("/get-procedimento", async (req, res) => {
+
+    await Procedimento.findAll({
+        attributes: ['name', 'valor', 'cuidados']
+    })
+        .then((dataProcedimento) => {
+            return res.json({
+                erro: false,
+                dataProcedimento
+            });
+        }).catch(() => {
+            return res.status(400).json({
+                erro: true,
+                mensagem: "Nenhum valor encontrado para Procedimento"
+            });
+        });
+});
+
+app.post("/add-procedimento", async (req, res) => {
+
+    await Procedimento.create(req.body)
+    .then(() => {
+        return res.json({
+            erro: false,
+            mensagem: "Dados de Procedimento cadastrados com sucesso!"
+        });
+    }).catch(() => {
+        return res.status(400).json({
+            erro: true,
+            mensagem: "Dados de Procedimento não cadastrados com sucesso!"
+        });
+    });
+});
+
+app.patch('/patch-procedimento', (req, res) => {
+    let id = req.params.id;
+    let name = req.body.name;
+  
+    User.findByIdAndUpdate(id, { $set: { name: name } }, { new: true }).then(updatedUser => {
+      res.send('User updated by id through PATCH');
+    });
+});
+
+app.delete('/del-procedimento', async (req, res) => {
+    try {
+     const procedimento = await Procedimento.destroy(req.params.id)
+     res.status(200).json({ procedimento: procedimento })
     } catch (error) {
      res.status(422).json({ error })
     }
